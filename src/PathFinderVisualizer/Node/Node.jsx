@@ -1,17 +1,26 @@
 import React,{ Component } from "react";
 import './Node.css';
+import { Grid } from "../../MyContext";
 
 export default class Node extends Component{
-    constructor(props){
-        super(props);
-        this.state = {};
-    }
 
     render(){
-        const {isStart, isFinish} = this.props;
-        const extraClassName = isFinish ? 'node-finish' : isStart ? 'node-start' : '';
+        const {col,
+            type,
+            onMouseDown,
+            onMouseEnter,
+            onMouseUp,
+            row,} = this.props;
+        //const extraClassName = isFinish ? 'node-finish' : isStart ? 'node-start' : '';
+        const extraClassName = `${type}`;
         return(
-            <div className={`node ${extraClassName}`}></div>
+            <div 
+            id={`node-${row}-${col}`}    
+            className={`node ${extraClassName}`}
+            //onMouseDown={()=>onMouseDown(row,col)}
+            //onMouseEnter={()=>onMouseEnter(row,col)}
+            //onMouseUp={()=>onMouseUp()}
+            ></div>
         );
     }
    
