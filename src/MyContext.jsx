@@ -1,7 +1,7 @@
 import { createContext, useState } from "react";
 import React from "react";
 
-export const Grid = createContext([]);
+export const Grid = createContext(null);
 
 const getDefaultGrid = () => {
     const grid = [];
@@ -23,6 +23,7 @@ const createNode = (col,row) => {
         distance: Infinity,
         isVisited: false,
         previousNode: null,
+        
     };
 };
 

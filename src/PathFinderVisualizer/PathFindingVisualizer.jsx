@@ -1,76 +1,86 @@
-import React,{ Component, useContext } from "react";
+import React,{ Component, useContext, useState } from "react";
 import './PathFindingVisualizer.css';
 import Node from "./Node/Node";
 import {Grid, GridContextProvider} from "../MyContext";
 
-// export default class PathFindingVisualizer extends Component{
-//     constructor(props){
-//         super(props);
-//         this.state = {
-//             nodes:[]
-//         };
-//     }
 export default function PathFindingVisualizer() {
+    
     const { grid, setGrid } = useContext(Grid);
-    console.log(grid);
+    const [mouseIsPressed, setMouseIsPressed] = useState(false);
+    console.log(Array.isArray(grid));
+    console.log(typeof(grid));
 
-    // componentDidMount(){
-    //     const {grid} = useContext(Grid);
-    //     this.setGrid(grid);
+    function handleMouseEnter(row, col){
+        if(!mouseIsPressed) return;
+        const newGrid = getNewGridWithWallToggled(grid,row,col);
+        //setGrid({newGrid});
+    }
+
+    function handleMouseUp(){
+        setMouseIsPressed(false);
+    }
+
+    // function mouseClick(row, col){
+    //     const newGrid = getNewGridWithWallToggled(grid,row,col);   
+    //     console.log("grid:",grid);     
     // }
 
-    // render(){
-    //     const {nodes} = this.state;
-    //     const {grid} = useContext(Grid);
-    //     console.log(nodes);
+    function handleMouseDown (row, col){
+        console.log("before calling toggle func -> grid,row,col ->",grid,row,col);
+        const newGrid = getNewGridWithWallToggled(grid,row,col);
+        console.log("after calling toggle func -> newGrid,row,col ->",newGrid,row,col);
+        //setGrid({newGrid});
+        console.log("after setting grid using setGrid -> grid,row,col ->",grid,row,col);
+        setMouseIsPressed(true);
+        console.log("after setting mouseIsPressed: ",mouseIsPressed);
 
-        return(
-            <div className="grid">
-                {grid.map((row,rowIdx)=>{
-                    return(
-                        <div key={rowIdx}>
-                            {row.map((node,nodeIdx)=>{
-                                const {row,col,type} = node;
-                                return(
-                                    <Node
-                                    key={nodeIdx}
-                                    col={col}
-                                    type={type}
-                                    mouseIsPressed={false}
-                                    onMouseDown={(row,col)=>this.handleMouseDown(row,col)}
-                                    onMouseEnter={(row, col) =>this.handleMouseEnter(row, col)}
-                                    onMouseUp={() => this.handleMouseUp()}
-                                    ></Node>
-                                );
-                            })}
-                        </div>
-                    );
-                })}
-            </div>
-        );
+    }
 
-        // return(
-        //     <div className="grid">
-        //          {nodes.map((row,rowIdx) => {
-        //             return(
-        //                 <div key={rowIdx}>
-        //                     {row.map((node, nodeIdx)=> {
-        //                         const {isStart, isFinish} = node;
-        //                         return (
-        //                             <Node
-        //                                 key = {nodeIdx}
-        //                                 isStart={isStart}
-        //                                 isFinish={isFinish}
-        //                                 test={'foo'}
-                                        
-        //                             ></Node>
-        //                         );
-        //                     })}
-        //                 </div>
-        //             );
-        //          })}
-        //     </div>
-        // );
-    // }
+    const getNewGridWithWallToggled = (grid,row,col) => {
+        console.log("in toggle -> grid,row,col ->",grid,row,col);
+        //const newGrid = grid.slice();
+        const node = grid[row][col];
+        const newNode = {
+            ...node, type: node.type === "node"
+            ? "wall" 
+            : "wall"
+            ? "node"
+            : node.type
+        };
+        //grid[row][col] = newNode;
+        const newGrid = [...grid];
+        newGrid[row][col] = newNode;
+        console.log("toggle method before return:",Array.isArray(grid));
+        setGrid(newGrid);
+        return grid;
+    };
+
+    return(
+        <div className="grid">
+            {grid.map((row,rowIdx)=>{
+                return(
+                    <div key={rowIdx}>
+                        {row.map((node,nodeIdx)=>{
+                            const {row,col,type} = node;
+                            return(
+                                <Node
+                                key={nodeIdx}
+                                row={row}
+                                col={col}
+                                type={type}
+                                // isWall = {node.isWall}
+                                mouseIsPressed={mouseIsPressed}
+                                //mouseClick={(row,col)=>mouseClick(row,col)}
+                                onMouseDown={(row,col)=>handleMouseDown(row,col)}
+                                onMouseEnter={(row, col) =>handleMouseEnter(row, col)}
+                                onMouseUp={() => handleMouseUp()}
+                                ></Node>
+                            );
+                        })}
+                    </div>
+                );
+            })}
+        </div>
+    );
    
 }
