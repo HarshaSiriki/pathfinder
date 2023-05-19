@@ -1,7 +1,15 @@
 import React,{ Component, useContext, useState } from "react";
 import './PathFindingVisualizer.css';
 import Node from "./Node/Node";
-import {Grid, GridContextProvider} from "../MyContext";
+import {Grid} from "../MyContext";
+import { dijkstra, getNodesInShortestPath } from "../Algorithms/dijkstra";
+
+const STARTNODE_Row = 10;
+const STARTNODE_Col = 7;
+const FINISHNODE_Row = 26;
+const FINISHNODE_Col = 42;
+
+
 
 export default function PathFindingVisualizer() {
     
@@ -12,11 +20,11 @@ export default function PathFindingVisualizer() {
 
     function handleMouseEnter(row, col){
         if(!mouseIsPressed) return;
-        const newGrid = getNewGridWithWallToggled(grid,row,col);
+        getNewGridWithWallToggled(grid,row,col);
         //setGrid({newGrid});
     }
 
-    function handleMouseUp(){
+    function handleMouseUp(){ 
         setMouseIsPressed(false);
     }
 
@@ -52,11 +60,58 @@ export default function PathFindingVisualizer() {
         newGrid[row][col] = newNode;
         console.log("toggle method before return:",Array.isArray(grid));
         setGrid(newGrid);
-        return grid;
+        return ;
     };
 
+    function visualizeDijkstra(){
+        const startNode = grid[STARTNODE_Row][STARTNODE_Col];
+        const finishNode = grid[FINISHNODE_Row][FINISHNODE_Col];
+        console.log("grid from path:",grid);
+        const visitedNodes = dijkstra(grid,startNode,finishNode);
+        console.log('visited nodes:',visitedNodes);
+        const nodesInShortestPath = getNodesInShortestPath(finishNode);
+        animateDijkstra(visitedNodes,nodesInShortestPath);
+        
+    }
+
+    function animateDijkstra(visitedNodes,nodesInShortestPath){
+        for (let i=0;i<= visitedNodes.length;i++){
+            if(i === visitedNodes.length){
+                setTimeout(()=>{
+                    animateShortestPath(nodesInShortestPath);
+                },20*i);
+                return;
+            }
+            setTimeout(()=>{
+                const node = visitedNodes[i];
+                // document.getElementById(`node-${node.row}-${node.col}`).className = `${node.type} node-visited`;
+                const element = document.getElementById(`node-${node.row}-${node.col}`);
+                if (element) {
+                    element.className = `${node.type} node-visited`;
+                }
+            }, 20*i);
+        }
+    }
+
+    function animateShortestPath(nodesInShortestPath){
+        for (let i=0; i<nodesInShortestPath.length; i++){
+            setTimeout(()=>{
+                const node = nodesInShortestPath[i];
+                // document.getElementById(`node-${node.row}-${node.col}`).className = `${node.type} node-visited`;
+                const element = document.getElementById(`node-${node.row}-${node.col}`);
+                if (element) {
+                    element.className = `${node.type} node-shortest-path`;
+                }
+            }, 50*i);
+        }
+    }
+
     return(
-        <div className="grid">
+        <div>
+            <button onClick={() => visualizeDijkstra()}>
+                Find path
+            </button>
+            <div className="grid">
             {grid.map((row,rowIdx)=>{
                 return(
                     <div key={rowIdx}>
@@ -80,7 +135,9 @@ export default function PathFindingVisualizer() {
                     </div>
                 );
             })}
+            </div>
         </div>
+        
     );
    
 }

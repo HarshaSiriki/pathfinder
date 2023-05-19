@@ -10,7 +10,6 @@ export default class Node extends Component{
         
         const {col,
             type,
-            mouseClick,
             onMouseDown,
             onMouseEnter,
             onMouseUp,
