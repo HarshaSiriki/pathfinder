@@ -11,7 +11,7 @@ const FINISHNODE_Col = null;
 
 const getDefaultGrid = () => {
     const grid = [];
-    for (let row = 0; row < 30; row++) {
+    for (let row = 0; row < 22; row++) {
         const currentRow = [];
         for (let col = 0; col < 50; col++) {
           currentRow.push(createNode(col, row));
