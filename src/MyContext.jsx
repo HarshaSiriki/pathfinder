@@ -2,10 +2,10 @@ import { createContext, useState } from "react";
 import React from "react";
 
 export const Grid = createContext(null);
-const STARTNODE_Row = 10;
-const STARTNODE_Col = 7;
-const FINISHNODE_Row = 26;
-const FINISHNODE_Col = 42;
+const STARTNODE_Row = null;
+const STARTNODE_Col = null;
+const FINISHNODE_Row = null;
+const FINISHNODE_Col = null;
 
 
 
@@ -39,9 +39,8 @@ const createNode = (col,row) => {
 
 export const GridContextProvider = (props) => {
     const [grid, setGrid] = useState(getDefaultGrid());
-    const [startNode, setStartNode] = useState(grid[STARTNODE_Row][STARTNODE_Col]);
-    const [finishNode, setFinishNode] = useState(grid[FINISHNODE_Row][FINISHNODE_Col]);
+    const [startNode, setStartNode] = useState({ row: STARTNODE_Row, col: STARTNODE_Col });
+    const [finishNode, setFinishNode] = useState({ row: FINISHNODE_Row, col: FINISHNODE_Col });
     const contextValue = {grid,setGrid, startNode,setStartNode,finishNode,setFinishNode}
-    console.log(contextValue);
     return(<Grid.Provider value={contextValue}>{props.children}</Grid.Provider>)
 }

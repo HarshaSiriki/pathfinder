@@ -1,16 +1,16 @@
-
-import './App.css';
-import PathFindingVisualizer from './PathFinderVisualizer/PathFindingVisualizer';
-import { Grid, GridContextProvider } from './MyContext';
+import "./App.css";
+import PathFindingVisualizer from "./PathFinderVisualizer/PathFindingVisualizer";
+import { GridContextProvider } from "./MyContext";
+import { DndProvider } from "react-dnd";
+import { HTML5Backend } from "react-dnd-html5-backend";
 
 function App() {
   return (
-    <div className="App">
+    <DndProvider backend={HTML5Backend} className="App">
       <GridContextProvider>
-        <PathFindingVisualizer ></PathFindingVisualizer>
+        <PathFindingVisualizer></PathFindingVisualizer>
       </GridContextProvider>
-      
-    </div>
+    </DndProvider>
   );
 }
 
