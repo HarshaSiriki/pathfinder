@@ -1,3 +1,12 @@
+## Drop the start node and finish node from the divs available beside the find path button and click on each node(div element) to toggle them from node to wall and wall to node.
+![Screenshot 2023-06-24 175043](https://github.com/HarshaSiriki/pathfinder/assets/87467222/c3b60191-1d61-4b98-bbe8-63d0421ccc54)
+
+## click on find path and wait for the algorithm to start executing.
+![Screenshot 2023-06-24 174845](https://github.com/HarshaSiriki/pathfinder/assets/87467222/14def3cd-03b8-471a-bd2c-97f288537910)
+
+![Screenshot 2023-06-24 174941](https://github.com/HarshaSiriki/pathfinder/assets/87467222/ee2ea5c0-34f6-473e-ac77-cb2a3cd27bbc)
+
+
 # Getting Started with Create React App
 
 This project was bootstrapped with [Create React App](https://github.com/facebook/create-react-app).
