@@ -1,74 +1,73 @@
-import React,{ Component, useContext, useState } from "react";
+import React,{ useContext, useState } from "react";
 import './PathFindingVisualizer.css';
 import Node from "./Node/Node";
 import {Grid} from "../MyContext";
 import { dijkstra, getNodesInShortestPath } from "../Algorithms/dijkstra";
+import { DndProvider } from "react-dnd";
+import { HTML5Backend } from "react-dnd-html5-backend";
+//import DragDrop from "./DragDrop";
+import {useDrag,useDrop } from "react-dnd";
 
-const STARTNODE_Row = 10;
-const STARTNODE_Col = 7;
-const FINISHNODE_Row = 26;
-const FINISHNODE_Col = 42;
 
 
 
 export default function PathFindingVisualizer() {
     
-    const { grid, setGrid } = useContext(Grid);
-    const [mouseIsPressed, setMouseIsPressed] = useState(false);
-    console.log(Array.isArray(grid));
-    console.log(typeof(grid));
+    const { grid, setGrid, startNode,setStartNode,finishNode,setFinishNode } = useContext(Grid);
+    const [mouseIsPressed, setMouseIsPressed ] = useState(false);
+    const STARTNODE_Row = startNode.row;
+    const STARTNODE_Col = startNode.col;
+    const FINISHNODE_Row = finishNode.row;
+    const FINISHNODE_Col = finishNode.col;
 
     function handleMouseEnter(row, col){
-        if(!mouseIsPressed) return;
-        getNewGridWithWallToggled(grid,row,col);
-        //setGrid({newGrid});
+        if(mouseIsPressed){
+            getNewGridWithWallToggled(grid,row,col);
+            console.log("Mouse Enter:",mouseIsPressed);    
+        }
     }
 
     function handleMouseUp(){ 
+        console.log("Mouse Up before:",mouseIsPressed);
         setMouseIsPressed(false);
+        console.log("Mouse Up:",mouseIsPressed);
     }
 
-    // function mouseClick(row, col){
-    //     const newGrid = getNewGridWithWallToggled(grid,row,col);   
-    //     console.log("grid:",grid);     
-    // }
-
     function handleMouseDown (row, col){
-        console.log("before calling toggle func -> grid,row,col ->",grid,row,col);
-        const newGrid = getNewGridWithWallToggled(grid,row,col);
-        console.log("after calling toggle func -> newGrid,row,col ->",newGrid,row,col);
-        //setGrid({newGrid});
-        console.log("after setting grid using setGrid -> grid,row,col ->",grid,row,col);
-        setMouseIsPressed(true);
-        console.log("after setting mouseIsPressed: ",mouseIsPressed);
-
+        if((row !== startNode.row && col !== startNode.col) && (row !== finishNode.row && col !== finishNode.col)){
+            if(!mouseIsPressed){
+                getNewGridWithWallToggled(grid,row,col);
+                console.log("Mouse Down if loop:",mouseIsPressed);
+                setMouseIsPressed(true);
+                console.log("Mouse Down set in loop:",mouseIsPressed);
+            }
+        }
+        console.log("Mouse Down:",mouseIsPressed);
     }
 
     const getNewGridWithWallToggled = (grid,row,col) => {
-        console.log("in toggle -> grid,row,col ->",grid,row,col);
-        //const newGrid = grid.slice();
         const node = grid[row][col];
-        const newNode = {
-            ...node, type: node.type === "node"
-            ? "wall" 
-            : "wall"
-            ? "node"
-            : node.type
-        };
-        //grid[row][col] = newNode;
-        const newGrid = [...grid];
-        newGrid[row][col] = newNode;
-        console.log("toggle method before return:",Array.isArray(grid));
-        setGrid(newGrid);
+        if(grid[row][col].type !== 'start-node' && grid[row][col].type !=='finish-node'){
+            const newNode = {
+                ...node, type: node.type === "node"
+                ? "wall" 
+                : "wall"
+                ? "node"
+                : node.type
+            };
+           
+            const newGrid = [...grid];
+            newGrid[row][col] = newNode;
+            setGrid(newGrid);
+        }
+        
         return ;
     };
 
     function visualizeDijkstra(){
         const startNode = grid[STARTNODE_Row][STARTNODE_Col];
         const finishNode = grid[FINISHNODE_Row][FINISHNODE_Col];
-        console.log("grid from path:",grid);
         const visitedNodes = dijkstra(grid,startNode,finishNode);
-        console.log('visited nodes:',visitedNodes);
         const nodesInShortestPath = getNodesInShortestPath(finishNode);
         animateDijkstra(visitedNodes,nodesInShortestPath);
         
@@ -84,7 +83,6 @@ export default function PathFindingVisualizer() {
             }
             setTimeout(()=>{
                 const node = visitedNodes[i];
-                // document.getElementById(`node-${node.row}-${node.col}`).className = `${node.type} node-visited`;
                 const element = document.getElementById(`node-${node.row}-${node.col}`);
                 if (element) {
                     element.className = `${node.type} node-visited`;
@@ -97,7 +95,6 @@ export default function PathFindingVisualizer() {
         for (let i=0; i<nodesInShortestPath.length; i++){
             setTimeout(()=>{
                 const node = nodesInShortestPath[i];
-                // document.getElementById(`node-${node.row}-${node.col}`).className = `${node.type} node-visited`;
                 const element = document.getElementById(`node-${node.row}-${node.col}`);
                 if (element) {
                     element.className = `${node.type} node-shortest-path`;
@@ -105,13 +102,45 @@ export default function PathFindingVisualizer() {
             }, 50*i);
         }
     }
+    const [{ isStartDragging }, startDrag] = useDrag((type) => ({
+        type: "nodeDiv",
+        item: { type: 'start-node' },
+        collect: (monitor) => ({
+          isDragging: !!monitor.isDragging(),
+        }),
+      }));
 
+      const [{ isFinishDragging }, finishDrag] = useDrag((type) => ({
+        type: "nodeDiv",
+        item: { type: 'finish-node' },
+        collect: (monitor) => ({
+          isDragging: !!monitor.isDragging(),
+        }),
+      }));
+      
     return(
-        <div>
-            <button onClick={() => visualizeDijkstra()}>
-                Find path
-            </button>
-            <div className="grid">
+        <div className="displayContainer">
+            <div className="topBar">
+                <div
+                ref={startDrag} 
+                id="startDiv"
+                type="start-node"
+                style={{opacity:  isStartDragging ? 0.5 : 1,
+                cursor: "grab", }}
+                >
+                </div>
+                <div
+                ref={finishDrag} 
+                id="finishDiv"
+                type="finish-node"
+                style={{opacity:  isFinishDragging ? 0.5 : 1,
+                cursor: "grab", }}
+                ></div>
+                <button onClick={() => visualizeDijkstra()}>
+                    Find path
+                </button>
+            </div>
+            <div className="grid" >
             {grid.map((row,rowIdx)=>{
                 return(
                     <div key={rowIdx}>
@@ -123,11 +152,9 @@ export default function PathFindingVisualizer() {
                                 row={row}
                                 col={col}
                                 type={type}
-                                // isWall = {node.isWall}
                                 mouseIsPressed={mouseIsPressed}
-                                //mouseClick={(row,col)=>mouseClick(row,col)}
                                 onMouseDown={(row,col)=>handleMouseDown(row,col)}
-                                onMouseEnter={(row, col) =>handleMouseEnter(row, col)}
+                                onMouseEnter={(row, col) =>handleMouseEnter(row, col)}  
                                 onMouseUp={() => handleMouseUp()}
                                 ></Node>
                             );
@@ -141,3 +168,4 @@ export default function PathFindingVisualizer() {
     );
    
 }
+
